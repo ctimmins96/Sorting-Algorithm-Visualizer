@@ -90,7 +90,7 @@ def sortTest(algoClass = None, sizes = None, nSamp = 200):
 			for i in range(len(sizes)):
 				rowDat = f"{sizes[i]}"
 				for j in range(len(algoClass)):
-					rowDat += f", {accry[i][j]}, {swaps['min'][i][j]}, {swaps['mean'][i][j]}, {swaps['max'][i][j]}, {times['min'][i][j]}, {times['mean'][i][j]}, {times['max'][i][j]}"
+					rowDat += f", {(accry[i][j]*100):3.3f}, {swaps['min'][i][j]}, {swaps['mean'][i][j]}, {swaps['max'][i][j]}, {times['min'][i][j]}, {times['mean'][i][j]}, {times['max'][i][j]}"
 				rowDat += '\n'
 				f.write(rowDat)
 			f.close()
