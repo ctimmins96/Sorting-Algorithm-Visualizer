@@ -29,35 +29,31 @@ def sortTest(algoClass = None, sizes = None, nSamp = 200):
 	if algoClass:
 		swaps = { 'mean': [], 'min': [], 'max': [] }
 		times = { 'mean': [], 'min': [], 'max': [] }
-        accry = []
+		accry = []
 		for size in sizes:
 			print(f"Beginning Sort Test using Size: {size}")
-            arr_acc = [0]*len(algoClass)
+			arr_acc = [0]*len(algoClass)
 			arr_swap_mean = [0]*len(algoClass)
 			arr_swap_max  = [0]*len(algoClass)
 			arr_swap_min  = [size ** 2]*len(algoClass)
-
 			arr_time_mean = [0]*len(algoClass)
 			arr_time_max  = [0]*len(algoClass)
 			arr_time_min  = [size ** 2]*len(algoClass)
-
 			sum_swap = [0]*len(algoClass)
 			sum_time = [0]*len(algoClass)
-            sum_accy = [0]*len(algoClass)
+			sum_accy = [0]*len(algoClass)
 			for itr in range(nSamp):
 				a = list()
 				for i in range(size):
 					a.append(random.random()*100)
-
-                ref = sorted(a)
+					ref = sorted(a)
 				# Create an object and sort it for each entry in the algoClass object
 				for j in range(len(algoClass)):
 					srt = algoClass[j]
 					print(f"Begin Testing {srt.__name__}.")
 					b = srt(a.copy())
 					c = b.sort()
-
-                    sum_accy[j] += (c == ref)
+					sum_accy[j] += (c == ref)
 
 					# perform stat calculations for swap data
 					sum_swap[j] += b.getSwaps()
@@ -71,7 +67,7 @@ def sortTest(algoClass = None, sizes = None, nSamp = 200):
 			for idx in range(len(sum_swap)):
 				arr_swap_mean[idx] = sum_swap[idx]/nSamp
 				arr_time_mean[idx] = sum_time[idx]/nSamp
-                arr_acc[idx] = sum_accy[idx]/nSamp
+				arr_acc[idx] = sum_accy[idx]/nSamp
 
 			# Append data to swaps and times dicts
 			swaps['mean'].append(arr_swap_mean.copy())
@@ -81,8 +77,7 @@ def sortTest(algoClass = None, sizes = None, nSamp = 200):
 			times['mean'].append(arr_time_mean.copy())
 			times['min'].append(arr_time_min.copy())
 			times['max'].append(arr_time_max.copy())
-
-            accry.append(arr_acc.copy())
+			accry.append(arr_acc.copy())
 		dt = datetime.datetime.now()
 		fName = f"Sorting_Tests_{dt.strftime('%y%m%d_%H%M%S')}.csv"
 		with open(fName,'w') as f:
@@ -134,4 +129,4 @@ def runSortTest():
     sortTest([BubbleSort, QuickSort], [10, 100, 200, 300, 500, 1000, 2000], 500)
 
 if __name__ == '__main__':
-    main()
+    runSortTest()
