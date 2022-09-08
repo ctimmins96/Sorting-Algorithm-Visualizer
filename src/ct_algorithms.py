@@ -5,9 +5,7 @@ TODOs:
 
 
 ### Import Statements
-import time
-import functools
-import random
+from time import perf_counter
 
 ### Class definitions
 
@@ -16,15 +14,19 @@ import random
 class SortAlgorithm:
     _dataSet = None
     _swaps = 0
+    _compares = 0
     _tElapsed = 0.00
     _ascending = True
 
-    def __init__(self,dataSet,ascending = True):
+    def __init__(self, dataSet, ascending:bool = True):
         self._dataSet = dataSet.copy()
         self._ascending = ascending
 
     def getSwaps(self) -> int:
         return self._swaps
+
+    def getCompares(self) -> int:
+        return self._compares
 
     def getData(self) -> list:
         return self._dataSet.copy()
@@ -38,6 +40,13 @@ class SortAlgorithm:
             self._dataSet[i] = self._dataSet[j]
             self._dataSet[j] = tmp
             self._swaps += 1
+    
+    def _compare(self, i, j, gt:bool) -> bool:
+        self._compares += 1
+        if gt:
+            return i > j
+        else:
+            return i < j
 
     def _swapf(self,i,j):
         print(f"\nSwapping items {i} and {j}...")
@@ -49,9 +58,9 @@ class SortAlgorithm:
 
     def sort(self) -> list:
         self._swaps = 0
-        tStart = time.time()
+        tStart = perf_counter()
         self._sort()
-        self._tElapsed = time.time() - tStart
+        self._tElapsed = perf_counter() - tStart
         return self._dataSet.copy()
 
 ## BubbleSort
@@ -63,7 +72,7 @@ class BubbleSort(SortAlgorithm):
 		while swap:
 			swap = False
 			for i in range(len(self._dataSet) - 1):
-				if (not self._ascending) != (self._dataSet[i] > self._dataSet[i+1]):
+				if (not self._ascending) != (self._compare(self._dataSet[i], self._dataSet[i+1], True)):
 					swap = True
 					self._swap(i, i+1)
 		return self._dataSet
@@ -91,7 +100,7 @@ class QuickSort(SortAlgorithm):
         piv = self._dataSet[high]
         i = low - 1
         for j in range(low, high):
-            if (not self._ascending) != (self._dataSet[j] < piv):
+            if (not self._ascending) != (self._compare(self._dataSet[j], piv, False)):
                 i += 1
                 self._swap(i, j)
         #if (not swap) or ((i == (high - 1)) and swap):

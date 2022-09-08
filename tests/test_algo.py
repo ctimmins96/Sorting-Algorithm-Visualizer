@@ -1,5 +1,6 @@
 ## import statements
 import random
+import os
 from ct_algorithms import BubbleSort
 from ct_algorithms import QuickSort
 import matplotlib.pyplot as plt
@@ -24,23 +25,30 @@ algoClass[] - Array of Class objects (not instances)
 
 def sortTest(algoClass = None, sizes = None, nSamp = 200):
 	if not sizes:
-	    sizes = [10 ** i for i in range(1, 5)]
+		sizes = [10 ** i for i in range(1, 5)]
     # Begin looping through the different desired sizes of array
 	if algoClass:
 		swaps = { 'mean': [], 'min': [], 'max': [] }
+		comps = { 'mean': [], 'min': [], 'max': [] }
 		times = { 'mean': [], 'min': [], 'max': [] }
 		accry = []
+		errs = []
 		for size in sizes:
 			print(f"Beginning Sort Test using Size: {size}")
 			arr_acc = [0]*len(algoClass)
+			arr_err = [0]*len(algoClass)
 			arr_swap_mean = [0]*len(algoClass)
 			arr_swap_max  = [0]*len(algoClass)
 			arr_swap_min  = [size ** 2]*len(algoClass)
+			arr_comp_mean = [0]*len(algoClass)
+			arr_comp_max  = [0]*len(algoClass)
+			arr_comp_min  = [size ** 2]*len(algoClass)
 			arr_time_mean = [0]*len(algoClass)
 			arr_time_max  = [0]*len(algoClass)
 			arr_time_min  = [size ** 2]*len(algoClass)
 			sum_swap = [0]*len(algoClass)
 			sum_time = [0]*len(algoClass)
+			sum_comp = [0]*len(algoClass)
 			sum_accy = [0]*len(algoClass)
 			for itr in range(nSamp):
 				a = list()
@@ -54,11 +62,15 @@ def sortTest(algoClass = None, sizes = None, nSamp = 200):
 					b = srt(a.copy())
 					c = b.sort()
 					sum_accy[j] += (c == ref)
+					arr_err[j] += (c != ref)
 
 					# perform stat calculations for swap data
 					sum_swap[j] += b.getSwaps()
+					sum_comp[j] += b.getCompares()
 					if b.getSwaps() > arr_swap_max[j]: arr_swap_max[j] = b.getSwaps()
 					if b.getSwaps() < arr_swap_min[j]: arr_swap_min[j] = b.getSwaps()
+					if b.getCompares() > arr_comp_max[j]: arr_comp_max[j] = b.getCompares()
+					if b.getCompares() < arr_comp_min[j]: arr_comp_min[j] = b.getCompares()
 					# perform stat calculations for time data
 					sum_time[j] += b.getTime()
 					if b.getTime() > arr_time_max[j]: arr_time_max[j] = b.getTime()
@@ -66,6 +78,7 @@ def sortTest(algoClass = None, sizes = None, nSamp = 200):
 				print(f"Iteration {itr+1} Complete.")
 			for idx in range(len(sum_swap)):
 				arr_swap_mean[idx] = sum_swap[idx]/nSamp
+				arr_comp_mean[idx] = sum_comp[idx]/nSamp
 				arr_time_mean[idx] = sum_time[idx]/nSamp
 				arr_acc[idx] = sum_accy[idx]/nSamp
 
@@ -73,15 +86,24 @@ def sortTest(algoClass = None, sizes = None, nSamp = 200):
 			swaps['mean'].append(arr_swap_mean.copy())
 			swaps['min'].append(arr_swap_min.copy())
 			swaps['max'].append(arr_swap_max.copy())
+			
+			comps['mean'].append(arr_comp_mean.copy())
+			comps['min'].append(arr_comp_min.copy())
+			comps['max'].append(arr_comp_max.copy())
 
 			times['mean'].append(arr_time_mean.copy())
 			times['min'].append(arr_time_min.copy())
 			times['max'].append(arr_time_max.copy())
 			accry.append(arr_acc.copy())
+			errs.append(arr_err.copy())
 		dt = datetime.datetime.now()
 		fName = f"Sorting_Tests_{dt.strftime('%y%m%d_%H%M%S')}.csv"
 		with open(fName,'w') as f:
 			header = 'Array Size'
+			
+			for i in range(len(algoClass)):
+				header += f", {algoClass[i],__name__} Errors"
+			
 			for i in range(len(algoClass)):
 				header += f", {algoClass[i].__name__} Accuracy [\%], {algoClass[i].__name__} Swap Min, {algoClass[i].__name__} Swap Mean, {algoClass[i].__name__} Swap Max, {algoClass[i].__name__} Time Min [s], {algoClass[i].__name__} Time Mean [s], {algoClass[i].__name__} Time Max [s]"
 			f.write(header)
@@ -89,6 +111,9 @@ def sortTest(algoClass = None, sizes = None, nSamp = 200):
 			# For each size case, generate the row data depending on the number of algoClass entries
 			for i in range(len(sizes)):
 				rowDat = f"{sizes[i]}"
+				for j in range(len(algoClass)):
+					rowDat += f", {errs[i][j]}"
+
 				for j in range(len(algoClass)):
 					rowDat += f", {(accry[i][j]*100):3.3f}, {swaps['min'][i][j]}, {swaps['mean'][i][j]}, {swaps['max'][i][j]}, {times['min'][i][j]}, {times['mean'][i][j]}, {times['max'][i][j]}"
 				rowDat += '\n'
