@@ -58,6 +58,7 @@ class SortAlgorithm:
 
     def sort(self) -> list:
         self._swaps = 0
+        self._compares = 0
         tStart = perf_counter()
         self._sort()
         self._tElapsed = perf_counter() - tStart

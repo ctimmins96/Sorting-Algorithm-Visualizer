@@ -3,8 +3,7 @@ import pygame
 import random
 from tkinter import *
 from enum import Enum
-from ct_algorithms import BubbleSort
-from ct_algorithms import QuickSort
+from Vis_Sort import BubbleSort, QuickSort
 
 pygame.init()
 

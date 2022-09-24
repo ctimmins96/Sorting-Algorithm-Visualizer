@@ -1,7 +1,7 @@
 ## import statements
 import random
 import os
-from ct_algorithms import BubbleSort
+from ..src.ct_algorithms import BubbleSort
 from ct_algorithms import QuickSort
 import matplotlib.pyplot as plt
 import datetime
