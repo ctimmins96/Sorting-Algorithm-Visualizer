@@ -48,6 +48,7 @@ def getMenuVals():
     menuAscR2 = Radiobutton(frame1, text='Descending', variable=menuAsc, value=0)
     menuAscR1.grid(row=2, column=1)
     menuAscR2.grid(row=2, column=2)
+    menuAsc.set(int(ASC))
 
     frame3 = Frame(menu, height=50, width=400)
     frame3.pack(side=BOTTOM)
@@ -66,6 +67,7 @@ def getMenuVals():
 
     scSize = Scale(frame2, variable=menuSize, from_=6, to=MAX_SIZE, length=300, orient=HORIZONTAL)
     scSize.pack(anchor=W)
+    menuSize.set(SIZE)
 
     menu.mainloop()
 
@@ -109,7 +111,9 @@ class DrawInfo:
         pygame.display.set_caption("Sorting Algorithm Visualizer")
 
     def setLst(self, lst):
-        self.lst = lst.copy()
+        srt_class = QuickSort if 'Quick' in SORT else BubbleSort
+
+        self.lst = srt_class(lst.copy(), ASC)
         #for i in range(len(lst)):
             #self.lst.append(Bin(lst[i], self.GRADIENT[i%3]))
         self.maxVal = max(lst)
@@ -125,31 +129,46 @@ class DrawInfo:
         self.window.fill(self.BG_COLOR)
 
         # Draw List in it's current state
-        for i, val in enumerate(self.lst):
+        for i, val in enumerate(self.lst.getData()):
             x = self.startX + i*self.blockWidth
             y = self.height - (val-self.minVal + 1)*self.blockHeight
-            pygame.draw.rect(self.window, self.GRADIENT[i%3], (x, y, self.blockWidth, (val - self.minVal + 1)*self.blockHeight))
+            if self.lst.sorting:
+                if i == self.lst.getPivot():
+                    pygame.draw.rect(self.window, self.GREEN, (x, y, self.blockWidth, (val - self.minVal + 1)*self.blockHeight))
+                elif i == self.lst.getCompare():
+                    pygame.draw.rect(self.window, self.RED, (x, y, self.blockWidth, (val - self.minVal + 1)*self.blockHeight))
+                else:
+                    pygame.draw.rect(self.window, self.GRADIENT[i%3], (x, y, self.blockWidth, (val - self.minVal + 1)*self.blockHeight))
+            else:
+                pygame.draw.rect(self.window, self.GRADIENT[i%3], (x, y, self.blockWidth, (val - self.minVal + 1)*self.blockHeight))
 
         # Update window
         pygame.display.update()
 
-def generateStartingSeq(n = 10, minVal = 1, maxVal = 10) -> list:
+def generateStartingSeq(n = 10) -> list:
     lst = []
+    def_lst = []
 
     for i in range(n):
-        lst.append(round(random.random()*(maxVal - minVal) + minVal))
+        def_lst.append(i)
+    
+    for j in range(n):
+        if len(def_lst) != 0:
+            idx = random.randint(0,len(def_lst)-1)
+            lst.append(def_lst[idx])
+            tmp = def_lst.pop(idx)
+        else:
+            lst.append(def_lst[0])
 
     return lst
 
 def main():
     global SORT, SIZE, ASC
     # Setting default values
-    mn = 1
-    mx = 30
     run = True
     clock = pygame.time.Clock()
 
-    drawInfo = DrawInfo(800, 600, lst = generateStartingSeq(SIZE, mn, mx))
+    drawInfo = DrawInfo(800, 600, lst = generateStartingSeq(SIZE))
 
     visState = SwFsm.BASE
     visNextState = SwFsm.BASE
@@ -170,21 +189,25 @@ def main():
             getMenuVals()
 
             # Modify drawInfo parameters when it is done
-            drawInfo.setLst(generateStartingSeq(SIZE, mn, mx))
+            #drawInfo.setLst(generateStartingSeq(SIZE))
             visNextState = SwFsm.BASE
 
         elif visState == SwFsm.SORT:
             # Sort
-            # Update cosmetics to show the compared item and the pivot item
-            pass
-            # Check if the sort is complete; set flag if it is
+            # Check if the sort is complete; set flag if it is. Update cosmetics to show the compared item and the pivot item
+            if drawInfo.lst.sorting:
+                drawInfo.lst.iterate()
+            else:
+                print('Sort Complete!')
+                print(f"Time Elapsed [S]: {drawInfo.lst.getTimes()}")
+                visNextState = SwFsm.BASE
         else:
             # FSM is broken
             run = False
 
         pygame.display.update()
 
-        # Event Handler / Next State\
+        # Event Handler / Next State
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -197,14 +220,20 @@ def main():
                     elif event.key == pygame.K_r:
                         ## Reset state
                         # Set a new list variable
-                        drawInfo.setLst(generateStartingSeq(SIZE,mn,mx))
+                        drawInfo.setLst(generateStartingSeq(SIZE))
                         visNextState = SwFsm.BASE
                     elif event.key == pygame.K_m:
                         # Menu State
                         visNextState = SwFsm.MENU
                     elif event.key == pygame.K_s:
-                        # Sort State
-                        pass
+                        ## Sort State
+                        # Start Sort
+                        if drawInfo.lst.sorted:
+                            drawInfo.setLst(generateStartingSeq(SIZE))
+                        drawInfo.lst.startSort()
+
+                        # Set Next State
+                        visNextState = SwFsm.SORT
                 elif visState == SwFsm.MENU:
                     # Do Menu things
                     visNextState = SwFsm.BASE
@@ -216,7 +245,7 @@ def main():
                     elif event.key == pygame.K_r:
                         ## Reset state
                         # Set a new list variable
-                        drawInfo.setLst(generateStartingSeq(SIZE,mn,mx))
+                        drawInfo.setLst(generateStartingSeq(SIZE))
                         visNextState = SwFsm.BASE
                 else:
                     # FSM is broken

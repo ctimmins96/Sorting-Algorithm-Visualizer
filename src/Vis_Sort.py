@@ -22,6 +22,7 @@ class SortAlg:
     def __init__(self, dataSet, ascending:bool = True):
         self._data_set = dataSet.copy()
         self._ascending = ascending
+        self._sorted = False
 
     ## Get / Set Functions
     # get_data
@@ -51,6 +52,11 @@ class SortAlg:
     # is_sorted
     def isSorted(self) -> bool:
         return self._sorted
+
+    # sorting
+    @property
+    def sorting(self) -> bool:
+        return self._is_sorting
     
     ## Swap function 
     def _swap(self, i, j):
@@ -71,6 +77,10 @@ class SortAlg:
     ## Iterate function (performs sorting algorithm one comparison at a time)
     def iterate(self) -> list:
         pass
+
+    @property
+    def sorted(self):
+        return self._sorted
 
     ## startSort (begins the sorting process)
     def startSort(self):
@@ -287,9 +297,10 @@ class QuickSort(SortAlg):
     
     ## Start Sort overload
     def startSort(self):
-        self._piv_idx = randint(0,len(self.__part) - 1)
-        self._swap(0, self._piv_idx)
-        super().startSort()
+        if not self._sorted:
+            self._piv_idx = randint(0,len(self.__part) - 1)
+            self._swap(0, self._piv_idx)
+            super().startSort()
 
     ## String operator
     def __str__(self):
