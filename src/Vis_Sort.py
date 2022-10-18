@@ -354,6 +354,170 @@ class QuickSort(SortAlg):
                         self._cmp_idx += 1
         return self._data_set
 
+## Heap
+class Heap:
+    
+    # Constructor
+    def __init__(self, dset):
+        self._heap = dset.copy()
+        self._len = len(dset)
+        self._end = self._len
+    
+    # length operator
+    def __len__(self):
+        return self._len
+    
+    # __str__ operator
+    def __str__(self):
+        return str(self._heap)
+
+    # __getitem__ 
+    def __getitem__(self, key):
+        return self._heap[key]
+
+    # __setitem__
+    def __setitem__(self, key, val):
+        self._heap[key] = val
+
+    @property
+    def end(self) -> int:
+        return self._end
+    # swap
+    def swap(self, i, j) -> None:
+        if i != j:
+            tmp = self._heap[i]
+            self._heap[i] = self._heap[j]
+            self._heap[j] = tmp
+
+    # heapify
+    def heapify(self):
+        self._len -= 1
+    
+    # get_parents
+    def get_parents(self) -> list:
+        """
+        obj.get_parents()
+
+        Description:
+            Returns an array of indices of all the "parent" nodes of the heap.
+        
+        Parameters:
+        - self (Heap): Object reference
+
+        Returns:
+        - res (list[int]): List of parent indices in the heap.
+        """
+        res = []
+        last_par = int(self._len/2) - 1
+        for i in range(last_par + 1):
+            res.append(i)
+        return res
+    
+    # get_child
+    def get_child(self,idx):
+        """
+        res = obj.get_child(idx)
+
+        Description:
+            Finds and returns the children of a given node (idx)
+        
+        Parameters:
+        - idx (int): Parent index.
+
+        Returns:
+        - res (list[int]): list of child indices
+        """
+        res = []
+        if (2*idx + 1) < self._len:
+            res.append(2*idx + 1)
+        
+        if (2*(idx + 1)) < self._len:
+            res.append(2*(idx+1))
+        return res
+
+## HeapSort
+class HeapSort(SortAlg):
+    _fmt = """
+=========================================
+=              HeapSort                 =
+=========================================
+= Sorting:                {}
+=
+= Data_Set:               {}
+= 
+= Pivot:                  {}
+= Compare:                {}
+=
+= Heap:                   {}
+=
+========================================="""
+
+    # Constructor
+    def __init__(self, dataSet, ascending: bool = True):
+        super().__init__(dataSet, ascending)
+        self.__heap = Heap(dataSet)
+
+    # __str__ constructor
+    def __str__(self) -> str:
+        return self._fmt.format(self._is_sorting, self._data_set, self._piv_idx, self._cmp_idx, self.__heap)
+    
+    # _swap
+    def _swap(self, i, j):
+        if self._is_sorting:
+            self.__heap.swap(i, j)
+            super()._swap(i, j)
+
+    # _heapify
+    def _heapify(self):
+        """
+        Take element at index 0 and move it to the end. Move all other elements to the left (back 1 index). Decrease length.
+        """
+        if self._is_sorting:
+            end = self.__heap.end
+            for i in range(end - 1):
+                self._swap(i,i+1)
+            self.__heap.heapify()
+
+    # startSort
+    def startSort(self):
+        if not self._sorted:
+            super().startSort()
+            self._piv_idx = self.__heap.get_parents()[-1]
+            self._cmp_idx = self.__heap.get_child(self._piv_idx)[0]
+
+    # iterate
+    def iterate(self) -> list:
+        if self._is_sorting:
+            if not self._sorted:
+                # If heap has length 1, heapify 1 last time and finish short
+                if len(self.__heap) == 1:
+                    self._heapify()
+                    self._finishSort()
+                else:
+                    # Perform Compare operation
+                    if (self._compare(self.__heap[self._piv_idx], self.__heap[self._cmp_idx], True)) == self._ascending:
+                        # Swap if the condition is met
+                        self._swap(self._piv_idx, self._cmp_idx)
+                    # Update Compare
+                    children = self.__heap.get_child(self._piv_idx)
+                    
+                    if self._cmp_idx < children[-1]:
+                        self._cmp_idx += 1
+                    else:
+                        # Update Pivot (if necessary)
+                        if self._piv_idx > 0:
+                            self._piv_idx -= 1
+                            self._cmp_idx = self.__heap.get_child(self._piv_idx)[0]
+                        else:
+                            # Heapify (if necessary)
+                            self._heapify()
+                            if len(self.__heap) > 1:
+                                self._piv_idx = self.__heap.get_parents()[-1]
+                                self._cmp_idx = self.__heap.get_child(self._piv_idx)[0]
+                            else:
+                                self._cmp_idx = 0
+        return self._data_set
+
 ### Main
 
 def main():
@@ -385,8 +549,20 @@ def main2():
     print(f"   Total Swaps: {b.getSwaps()}")
     print(f"  Time Elapsed: {b.getTimes():.5f}")
 
-def partitionRobustness():
-    a = [3, 1, 2, 6, 4, 5, 0, 7, 9, 8] 
+def testHeapSort():
+    a = [3, 1, 2, 6, 4, 5, 0, 7, 9, 8]
+    b = HeapSort(a)
+    b.startSort()
+    print(str(b))
+    while not b.isSorted():
+        #sleep(0.1)
+        b.iterate()
+        print(str(b))
+    
+    print('Sorting Complete')
+    print(f"Total Compares: {b.getCompares()}")
+    print(f"   Total Swaps: {b.getSwaps()}")
+    print(f"  Time Elapsed: {b.getTimes():.5f}")
 
 if __name__ == "__main__":
-    main2()
+    testHeapSort()

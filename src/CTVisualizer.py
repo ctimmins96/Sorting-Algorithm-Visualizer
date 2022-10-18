@@ -3,12 +3,13 @@ import pygame
 import random
 from tkinter import *
 from enum import Enum
-from Vis_Sort import BubbleSort, QuickSort
+from Vis_Sort import BubbleSort, QuickSort, HeapSort
 
 pygame.init()
 
 MAX_SIZE = 500
-SORTS = ['Bubble Sort', 'Quick Sort']
+SORTS = ['Bubble Sort', 'Heap Sort', 'Quick Sort']
+SORT_MAP = {'Bubble Sort': BubbleSort, 'Quick Sort': QuickSort, 'Heap Sort': HeapSort}
 SIZE = 20
 SORT = 'Quick Sort'
 ASC = True
@@ -40,8 +41,10 @@ def getMenuVals():
 
     menuSortR1 = Radiobutton(frame1, text='Bubble Sort', variable=menuSort, value='Bubble Sort')
     menuSortR2 = Radiobutton(frame1, text='Quick Sort', variable=menuSort, value='Quick Sort')
+    menuSortR3 = Radiobutton(frame1, text='Heap Sort', variable=menuSort, value='Heap Sort')
     menuSortR1.grid(row=1, column=1)
     menuSortR2.grid(row=1, column=2)
+    menuSortR3.grid(row=1, column=3)
     menuSort.set(SORT)
 
     menuAscR1 = Radiobutton(frame1, text='Ascending', variable=menuAsc, value=1)
@@ -111,7 +114,7 @@ class DrawInfo:
         pygame.display.set_caption("Sorting Algorithm Visualizer")
 
     def setLst(self, lst):
-        srt_class = QuickSort if 'Quick' in SORT else BubbleSort
+        srt_class = SORT_MAP[SORT]
 
         self.lst = srt_class(lst.copy(), ASC)
         #for i in range(len(lst)):
@@ -174,7 +177,7 @@ def main():
     visNextState = SwFsm.BASE
 
     while run:
-        clock.tick(60)
+        clock.tick(30)
 
         # This is where the drawing functions will go
         drawInfo.draw()
@@ -198,8 +201,8 @@ def main():
             if drawInfo.lst.sorting:
                 drawInfo.lst.iterate()
             else:
-                print('Sort Complete!')
-                print(f"Time Elapsed [S]: {drawInfo.lst.getTimes()}")
+                print(f"{SORT} Complete!")
+                print(f"Time Elapsed [s]: {drawInfo.lst.getTimes()}")
                 visNextState = SwFsm.BASE
         else:
             # FSM is broken
