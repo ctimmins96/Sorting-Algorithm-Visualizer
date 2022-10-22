@@ -43,8 +43,8 @@ def getMenuVals():
     menuSortR2 = Radiobutton(frame1, text='Quick Sort', variable=menuSort, value='Quick Sort')
     menuSortR3 = Radiobutton(frame1, text='Heap Sort', variable=menuSort, value='Heap Sort')
     menuSortR1.grid(row=1, column=1)
-    menuSortR2.grid(row=1, column=2)
-    menuSortR3.grid(row=1, column=3)
+    menuSortR2.grid(row=1, column=3)
+    menuSortR3.grid(row=1, column=2)
     menuSort.set(SORT)
 
     menuAscR1 = Radiobutton(frame1, text='Ascending', variable=menuAsc, value=1)
@@ -177,7 +177,7 @@ def main():
     visNextState = SwFsm.BASE
 
     while run:
-        clock.tick(30)
+        clock.tick(60)
 
         # This is where the drawing functions will go
         drawInfo.draw()
@@ -257,4 +257,5 @@ def main():
     pygame.quit()
 
 if __name__ == '__main__':
+    print('Keybinds:\n\'M\' = Menu\n\'R\' = Reset / Randomize\n\'S\' = Sort\n\'ESC\' = Kill / Stop program')
     main()
