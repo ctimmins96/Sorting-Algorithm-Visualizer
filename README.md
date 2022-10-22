@@ -16,6 +16,7 @@ Use a virtual environment if you like. Just need to enter the folling items in t
 
 ```
 > git clone https://github.com/ctimmins96/Sorting-Algorithm-Visualizer.git
+> cd ./Sorting-Algorithm-Visualizer
 > pip install -e .
 ```
 
