@@ -23,4 +23,4 @@ pip install -e .
 
 Once installed, enter the following in the command line:
 
-`timmins-sorter`
+```timmins-sorter```
