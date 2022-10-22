@@ -6,3 +6,7 @@ src/__pycache__
 *.pyc
 *.xlsx
 *.xyz
+*.egg-info/
+*.egg-info/*
+dist/
+dist/*

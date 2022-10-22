@@ -3,7 +3,7 @@ import pygame
 import random
 from tkinter import *
 from enum import Enum
-from Vis_Sort import BubbleSort, QuickSort, HeapSort
+from .Vis_Sort import BubbleSort, QuickSort, HeapSort
 
 pygame.init()
 
@@ -11,28 +11,37 @@ MAX_SIZE = 500
 SORTS = ['Bubble Sort', 'Heap Sort', 'Quick Sort']
 SORT_MAP = {'Bubble Sort': BubbleSort, 'Quick Sort': QuickSort, 'Heap Sort': HeapSort}
 SIZE = 20
+SPEED = 60
+FFWD = 3
 SORT = 'Quick Sort'
 ASC = True
 
 ## Function Definitions
 def getMenuVals():
-    global SIZE, SORT, ASC
+    global SIZE, SORT, ASC, SPEED, FFWD
     menu = Tk()
+    menu.title('Menu')
     menuAsc = IntVar()
     menuSize = IntVar()
     menuSort = StringVar()
+    menuSpeed = StringVar()
+    menuFfwd = StringVar()
 
     def setVals():
-        global SIZE, ASC, SORT
+        global SIZE, ASC, SORT, SPEED, FFWD
         SIZE = menuSize.get()
         ASC = (menuAsc.get() == 1)
         SORT = menuSort.get()
+        SPEED = int(menuSpeed.get())
+        FFWD = int(menuFfwd.get())
         menu.destroy()
 
     def resetVals():
         menuSort.set(SORT)
         menuAsc.set(1 if ASC else 0)
         scSize.set(SIZE)
+        menuSpeed.set(str(SPEED))
+        menuFfwd.set(str(FFWD))
 
     ## Create widgets
     menu.geometry("400x200")
@@ -69,8 +78,19 @@ def getMenuVals():
     frame2.pack(side=BOTTOM)
 
     scSize = Scale(frame2, variable=menuSize, from_=6, to=MAX_SIZE, length=300, orient=HORIZONTAL)
-    scSize.pack(anchor=W)
+    scSize.grid(row=0, column=0, columnspan=2, sticky='ew')
     menuSize.set(SIZE)
+
+    lSpeed = Label(frame2, text="Speed", font=('calibri', 10, 'normal'))
+    tSpeed = Entry(frame2, textvariable=menuSpeed)
+    lFfwd = Label(frame2, text="Fast-Forward Speed", font=('Calibri', 10, 'normal'))
+    tFfwd = Entry(frame2, textvariable=menuFfwd)
+    lSpeed.grid(row=1,column=0)
+    tSpeed.grid(row=1,column=1)
+    lFfwd.grid(row=2,column=0)
+    tFfwd.grid(row=2,column=1)
+    menuSpeed.set(str(SPEED))
+    menuFfwd.set(str(FFWD))
 
     menu.mainloop()
 
@@ -169,15 +189,24 @@ def main():
     global SORT, SIZE, ASC
     # Setting default values
     run = True
+    print("""==========================================================
+= Keybinds:                                              =
+=                      'M' = Menu                        =
+=                      'R' = Reset / Randomize           =
+=                      'S' = Sort                        =
+= (hold while sorting) 'F' = Fast-Forward (SPEED x FFWD) =
+=                    'ESC' = Kill / Stop program         =
+==========================================================""")
     clock = pygame.time.Clock()
 
     drawInfo = DrawInfo(800, 600, lst = generateStartingSeq(SIZE))
 
     visState = SwFsm.BASE
     visNextState = SwFsm.BASE
+    mod = 1
 
     while run:
-        clock.tick(60)
+        clock.tick(SPEED*mod)
 
         # This is where the drawing functions will go
         drawInfo.draw()
@@ -203,6 +232,7 @@ def main():
             else:
                 print(f"{SORT} Complete!")
                 print(f"Time Elapsed [s]: {drawInfo.lst.getTimes()}")
+                print(f"Total Comparison: {drawInfo.lst.getCompares()}\n")
                 visNextState = SwFsm.BASE
         else:
             # FSM is broken
@@ -250,12 +280,16 @@ def main():
                         # Set a new list variable
                         drawInfo.setLst(generateStartingSeq(SIZE))
                         visNextState = SwFsm.BASE
+                    elif event.key == pygame.K_f:
+                        # Fast forward
+                        mod = FFWD
                 else:
                     # FSM is broken
                     run = False
+            elif event.type == pygame.KEYUP and event.key == pygame.K_f:
+                mod = 1
         visState = visNextState
     pygame.quit()
 
 if __name__ == '__main__':
-    print('Keybinds:\n\'M\' = Menu\n\'R\' = Reset / Randomize\n\'S\' = Sort\n\'ESC\' = Kill / Stop program')
     main()
