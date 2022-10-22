@@ -12,5 +12,13 @@ The BubbleSort, HeapSort, and QuickSort have been added to show the number of co
 
 ## Installation
 
+Use a virtual environment if you like. Just need to enter the folling items in the command line:
+
+`git clone https://github.com/ctimmins96/Sorting-Algorithm-Visualizer.git`
+`pip install -e .`
+
 ## Use
 
+Once installed, enter the following in the command line:
+
+`timmins-sorter`
