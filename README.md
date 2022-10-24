@@ -20,6 +20,12 @@ Use a virtual environment if you like. Just need to enter the folling items in t
 > pip install -e .
 ```
 
+Package is now available on PyPi! In can be installed doing the following:
+
+```
+> pip install timmins_sort
+```
+
 ## Use
 
 Once installed, enter the following in the command line:
