@@ -33,3 +33,11 @@ Once installed, enter the following in the command line:
 ```
 > timmins-sorter
 ```
+
+Alternatively, the project and be imported and run via the following:
+
+```python
+import timmins_sort
+
+timmins_sort.run()
+```
