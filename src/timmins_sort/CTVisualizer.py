@@ -7,7 +7,7 @@ from .Vis_Sort import BubbleSort, QuickSort, HeapSort
 
 pygame.init()
 
-MAX_SIZE = 500
+MAX_SIZE = 100
 SORTS = ['Bubble Sort', 'Heap Sort', 'Quick Sort']
 SORT_MAP = {'Bubble Sort': BubbleSort, 'Quick Sort': QuickSort, 'Heap Sort': HeapSort}
 SIZE = 20
